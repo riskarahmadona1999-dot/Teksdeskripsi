@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jelajah Nusantara — Petualangan Teks Deskripsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#132743;
+    --bg-deep2:#0d1c30;
+    --paper:#fdf6e6;
+    --paper-dark:#f2e6cc;
+    --ink:#22283a;
+    --ink-soft:#5b5440;
+    --gold:#f0ad1f;
+    --gold-deep:#c8820a;
+    --terracotta:#e2622b;
+    --teal:#0f8b8d;
+    --teal-deep:#0a5f60;
+    --success:#4c9a2a;
+    --success-bg:#e8f4df;
+    --error:#d64550;
+    --error-bg:#fbe4e2;
+    --shadow: 0 10px 30px rgba(13,28,48,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:
+      radial-gradient(ellipse at 20% 10%, #1b3a5c 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 85%, #0a4f52 0%, transparent 50%),
+      linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-deep2) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:24px 14px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; margin:0;}
+  .brand{
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    color:var(--paper); text-align:center; margin-bottom:22px;
+  }
+  .brand-badge{
+    font-size:30px; background:var(--gold);
+    width:52px;height:52px;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow); transform:rotate(-6deg);
+    flex-shrink:0;
+  }
+  .brand h1{font-size:26px; color:var(--paper); letter-spacing:0.3px;}
+  .brand p{margin:2px 0 0; font-size:13px; color:#b9c8dc; font-weight:700; letter-spacing:1px; text-transform:uppercase;}
+
+  .hud{
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:20px;
+  }
+  .hud-chip{
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+    color:var(--paper); padding:8px 16px; border-radius:999px; font-weight:700; font-size:14px;
+    display:flex; align-items:center; gap:6px; backdrop-filter:blur(4px);
+  }
+
+  .panel{
+    background:var(--paper);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    padding:28px;
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  .panel::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image: radial-gradient(rgba(34,40,58,0.035) 1px, transparent 1px);
+    background-size: 14px 14px;
+    pointer-events:none;
+  }
+  .panel > *{position:relative;}
+
+  /* ===== START SCREEN ===== */
+  .start-hero{text-align:center;}
+  .compass{
+    width:120px;height:120px;margin:0 auto 14px;
+    animation: spin 40s linear infinite;
+  }
+  @keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .start-hero h2{font-size:28px;color:var(--ink); margin-bottom:8px;}
+  .start-hero p{font-size:16px; color:var(--ink-soft); max-width:480px; margin:0 auto 22px; line-height:1.6;}
+  .guide-box{
+    display:flex; gap:14px; align-items:flex-start; text-align:left;
+    background:var(--paper-dark); border-radius:16px; padding:16px 18px; margin:0 0 24px;
+    border-left:5px solid var(--terracotta);
+  }
+  .guide-box .emoji{font-size:34px;}
+  .guide-box b{color:var(--terracotta);}
+  .btn-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
+  .btn{
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;
+    border:none; border-radius:14px; padding:14px 26px; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease; letter-spacing:0.3px;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(0);}
+  .btn-primary{background:var(--terracotta); color:#fff; box-shadow:0 6px 0 var(--gold-deep2, #a4431a);}
+  .btn-primary:hover{box-shadow:0 8px 0 #a4431a;}
+  .btn-ghost{background:transparent; color:var(--teal-deep); border:2px solid var(--teal); }
+  .btn-gold{background:var(--gold); color:#4a3200; box-shadow:0 6px 0 var(--gold-deep);}
+  .btn-small{padding:9px 16px; font-size:14px; border-radius:10px;}
+  .btn:disabled{opacity:0.4; cursor:not-allowed; transform:none;}
+
+  /* ===== MAP ===== */
+  .map-title{text-align:center; margin-bottom:6px;}
+  .map-title h2{font-size:24px;}
+  .map-title p{color:var(--ink-soft); font-size:14px; margin-top:4px;}
+  .archipelago{
+    position:relative; margin:26px 0 10px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .sea-route{
+    position:relative;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .island-row{display:flex; flex-wrap:wrap; justify-content:center; gap:18px; padding:10px 0;}
+  .island{
+    width:130px; text-align:center; cursor:pointer; user-select:none;
+    padding:14px 8px 12px; border-radius:18px; border:2px dashed transparent;
+    transition:transform .15s ease, border-color .15s ease;
+    position:relative;
+  }
+  .island:hover{transform:translateY(-4px);}
+  .island.locked{cursor:not-allowed; opacity:0.55;}
+  .island.locked:hover{transform:none;}
+  .island.current{border-color:var(--terracotta); background:rgba(226,98,43,0.07);}
+  .island-icon{
+    font-size:38px; width:66px;height:66px; margin:0 auto 8px;
+    background:var(--paper-dark); border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:inset 0 0 0 3px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.12);
+  }
+  .island.done .island-icon{background:linear-gradient(145deg,#fde9b8,#f0ad1f); }
+  .island-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink); line-height:1.25;}
+  .island-stars{margin-top:5px; font-size:13px; letter-spacing:1px;}
+  .lock-tag{font-size:11px; color:var(--ink-soft); margin-top:4px; font-weight:700;}
+  .ship{position:absolute; top:-6px; font-size:20px; transform:translateX(-50%);}
+
+  /* ===== LEVEL SCREEN ===== */
+  .level-header{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .level-tag{
+    display:inline-block; background:var(--teal); color:#fff; font-weight:800; font-size:12px;
+    padding:4px 12px; border-radius:999px; letter-spacing:0.5px; margin-bottom:8px;
+  }
+  .level-header h2{font-size:22px; color:var(--ink);}
+  .story{
+    background:linear-gradient(135deg,#fff,#fbf1dc);
+    border:1.5px dashed var(--gold-deep);
+    border-radius:14px; padding:14px 18px; margin:14px 0 20px;
+    font-size:14.5px; line-height:1.65; color:var(--ink-soft);
+  }
+  .story b{color:var(--terracotta);}
+  .challenge-box{
+    background:var(--paper-dark); border-radius:14px; padding:16px 18px; margin-bottom:18px;
+  }
+  .challenge-box h3{font-size:15px; color:var(--teal-deep); margin-bottom:6px;}
+  .challenge-box p{margin:0; font-size:14.5px; line-height:1.6; color:var(--ink);}
+
+  .qcard{margin-bottom:22px; padding-bottom:20px; border-bottom:1.5px solid #e9dfc4;}
+  .qcard:last-of-type{border-bottom:none;}
+  .qnum{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--terracotta); font-size:14px; margin-bottom:4px;}
+  .qtext{font-size:15.5px; font-weight:700; color:var(--ink); margin-bottom:12px; line-height:1.55;}
+  .passage{
+    font-style:italic; background:#fff; border-left:4px solid var(--teal); padding:12px 16px;
+    border-radius:8px; margin-bottom:12px; font-size:14.5px; line-height:1.7; color:#333;
+  }
+  .options{display:flex; flex-direction:column; gap:9px;}
+  .opt{
+    text-align:left; background:#fff; border:2px solid #e4d9ba; border-radius:12px;
+    padding:11px 14px; font-size:14.5px; font-weight:600; cursor:pointer; color:var(--ink);
+    font-family:'Nunito',sans-serif; transition:all .12s ease; display:flex; gap:10px; align-items:center;
+  }
+  .opt:hover{border-color:var(--teal);}
+  .opt.selected{border-color:var(--terracotta); background:#fef2ea;}
+  .opt.correct{border-color:var(--success); background:var(--success-bg); color:#265216;}
+  .opt.wrong{border-color:var(--error); background:var(--error-bg); color:#7a1f26;}
+  .opt-letter{
+    width:24px;height:24px;border-radius:8px; background:var(--paper-dark); flex-shrink:0;
+    display:flex;align-items:center;justify-content:center; font-size:12.5px; font-weight:800;
+  }
+
+  .feedback{
+    margin-top:10px; padding:11px 14px; border-radius:10px; font-size:14px; line-height:1.55;
+    display:none; font-weight:600;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--success-bg); color:#265216; border:1.5px solid #b9dba0;}
+  .feedback.no{background:var(--error-bg); color:#7a1f26; border:1.5px solid #f0b3b3;}
+
+  .word-bank{display:flex; flex-wrap:wrap; gap:9px; margin:14px 0;}
+  .word-chip{
+    background:#fff; border:2px solid #e4d9ba; border-radius:999px; padding:8px 16px;
+    font-weight:700; font-size:14.5px; cursor:pointer; transition:all .12s ease; color:var(--ink);
+  }
+  .word-chip:hover{border-color:var(--teal);}
+  .word-chip.picked{background:var(--terracotta); color:#fff; border-color:var(--terracotta);}
+  .word-chip.correct{background:var(--success); color:#fff; border-color:var(--success);}
+  .word-chip.missed{background:#fff; color:var(--error); border-color:var(--error); border-style:dashed;}
+  .word-chip.wrongpick{background:var(--error); color:#fff; border-color:var(--error); text-decoration:line-through;}
+
+  .sentence-pool{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+  .sentence-item{
+    background:#fff; border:2px solid #e4d9ba; border-radius:12px; padding:11px 14px;
+    font-size:14px; line-height:1.5; cursor:pointer; display:flex; gap:10px; align-items:flex-start;
+    transition:all .12s ease;
+  }
+  .sentence-item:hover{border-color:var(--teal);}
+  .sentence-item.chosen{opacity:0.4; cursor:not-allowed;}
+  .order-badge{
+    width:22px;height:22px;border-radius:50%; background:var(--paper-dark); flex-shrink:0;
+    display:flex;align-items:center;justify-content:center; font-size:12px; font-weight:800; margin-top:1px;
+  }
+  .sequence-slot{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;
+  }
+  .seq-num{
+    background:var(--teal); color:#fff; border-radius:8px; width:26px;height:26px; font-size:12px;
+    font-weight:800; display:flex;align-items:center;justify-content:center; flex-shrink:0;
+  }
+  .seq-line{display:flex; gap:8px; align-items:flex-start; background:var(--paper-dark); padding:9px 12px; border-radius:10px; font-size:14px;}
+
+  textarea{
+    width:100%; min-height:130px; border-radius:12px; border:2px solid #e4d9ba;
+    padding:14px; font-family:'Nunito',sans-serif; font-size:14.5px; line-height:1.6; color:var(--ink);
+    resize:vertical;
+  }
+  textarea:focus{outline:none; border-color:var(--teal);}
+  .checklist{margin-top:14px; display:flex; flex-direction:column; gap:8px;}
+  .check-item{display:flex; gap:9px; align-items:center; font-size:14px; font-weight:700;}
+  .check-item .mark{width:20px;text-align:center;}
+  .check-item.pass{color:var(--success);}
+  .check-item.fail{color:var(--error);}
+
+  .model-answer{
+    background:#eef6f6; border-left:4px solid var(--teal); border-radius:10px; padding:14px 16px;
+    margin-top:14px; font-size:14px; line-height:1.65;
+  }
+  .model-answer b{color:var(--teal-deep);}
+
+  .level-footer{display:flex; justify-content:space-between; align-items:center; margin-top:8px; gap:10px; flex-wrap:wrap;}
+  .level-score{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--ink-soft); font-size:14px;}
+
+  /* ===== RESULT MODAL ===== */
+  .result-stars{font-size:44px; text-align:center; margin:10px 0 4px; letter-spacing:6px;}
+  .result-box{text-align:center;}
+  .result-box h2{font-size:24px; margin-bottom:6px;}
+  .badge-earned{
+    display:inline-flex; align-items:center; gap:8px; background:var(--paper-dark);
+    padding:9px 18px; border-radius:999px; font-weight:800; color:var(--terracotta); margin:10px 0 18px;
+    font-family:'Baloo 2',sans-serif; font-size:14.5px;
+  }
+
+  /* ===== FINAL SCREEN ===== */
+  .final-badge{
+    width:110px;height:110px; border-radius:50%; margin:8px auto 14px;
+    background:linear-gradient(145deg,#fde9b8,#f0ad1f);
+    display:flex; align-items:center; justify-content:center; font-size:52px;
+    box-shadow:0 10px 24px rgba(240,173,31,0.45);
+  }
+  .badge-grid{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:18px 0;}
+  .mini-badge{
+    background:var(--paper-dark); border-radius:12px; padding:10px 12px; width:120px; text-align:center;
+    font-size:12px; font-weight:700; color:var(--ink-soft);
+  }
+  .mini-badge .ic{font-size:26px; margin-bottom:4px;}
+  .mini-badge.locked{opacity:0.4;}
+
+  /* ===== ANSWER KEY MODAL ===== */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,20,35,0.65); display:none;
+    align-items:flex-start; justify-content:center; padding:30px 14px; z-index:50; overflow-y:auto;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--paper); border-radius:20px; max-width:720px; width:100%; padding:26px;
+    box-shadow:var(--shadow); position:relative;
+  }
+  .modal-close{
+    position:absolute; top:16px; right:16px; background:var(--paper-dark); border:none;
+    width:34px;height:34px;border-radius:10px; font-size:16px; cursor:pointer; font-weight:800;
+  }
+  .key-section{margin-bottom:22px;}
+  .key-section h3{color:var(--terracotta); font-size:16px; margin-bottom:10px;}
+  .key-item{background:#fff; border:1.5px solid #e4d9ba; border-radius:10px; padding:10px 14px; margin-bottom:8px; font-size:13.5px; line-height:1.55;}
+  .key-item b{color:var(--teal-deep);}
+
+  footer{text-align:center; color:#7f93ac; font-size:12px; margin-top:26px;}
+
+  @media (max-width:520px){
+    .panel{padding:20px 16px;}
+    .island{width:44%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="brand-badge">🧭</div>
+    <div>
+      <h1>Jelajah Nusantara</h1>
+      <p>Petualangan Teks Deskripsi · Kelas VII</p>
+    </div>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="hud-chip">⭐ <span id="hud-stars">0</span> / 15 bintang</div>
+    <div class="hud-chip">💎 <span id="hud-score">0</span> poin</div>
+    <div class="hud-chip" style="cursor:pointer;" onclick="openKeyModal()">📖 Kunci Jawaban</div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer>Dibuat untuk pembelajaran Bahasa Indonesia Fase D — Kurikulum Merdeka · Materi: Teks Deskripsi</footer>
+</div>
+
+<div class="modal-overlay" id="keyModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeKeyModal()">✕</button>
+    <h2 style="margin-bottom:14px;">📖 Kunci Jawaban &amp; Penjelasan</h2>
+    <div id="keyContent"></div>
+  </div>
+</div>
+
+<script>
+/* =======================================================
+   DATA LEVEL
+======================================================= */
+const LEVELS = [
+  {
+    id:1,
+    place:"Danau Toba, Sumatera Utara",
+    icon:"🏞️",
+    type:"mcq",
+    badgeName:"Pengamat Jitu",
+    badgeIcon:"🔍",
+    story:"Petualanganmu dimulai di <b>Sumatera Utara</b>! Kak Nusa, pemandumu, mengajakmu menebak berbagai tempat dan benda khas Nusantara hanya dari deskripsinya. Bacalah setiap gambaran dengan teliti, lalu tebak objek yang dimaksud.",
+    challenge:"Tebak Objek dari Deskripsi — pilih satu jawaban yang paling tepat untuk setiap paragraf deskripsi di bawah ini.",
+    questions:[
+      {
+        passage:"Airnya membentang luas bagaikan lautan di tengah daratan. Warnanya biru kehijauan, tenang ketika pagi, namun beriak kecil saat angin sore berhembus. Di tengahnya berdiri sebuah pulau yang dahulu menjadi tempat tinggal seorang raja. Kabut tipis kerap menyelimuti permukaannya di pagi hari, membuat pemandangan tampak seperti negeri dongeng.",
+        options:["Danau Toba","Danau Sentani","Pantai Kuta","Laut Jawa"],
+        correct:0,
+        explanation:"Ciri konkret seperti 'lautan di tengah daratan', 'pulau di tengahnya' (Pulau Samosir), dan 'tempat tinggal seorang raja' merujuk pada Danau Toba di Sumatera Utara."
+      },
+      {
+        passage:"Atapnya melengkung runcing di kedua ujungnya, mirip tanduk kerbau yang gagah menjulang ke langit. Dindingnya berukir motif alam berwarna keemasan, berpadu dengan hitam dan merah yang mencolok. Rumah ini berdiri di atas tiang-tiang kayu yang tinggi, tempat berkumpulnya satu keluarga besar dari garis keturunan ibu.",
+        options:["Rumah Gadang","Rumah Joglo","Rumah Honai","Tongkonan"],
+        correct:0,
+        explanation:"Atap melengkung menyerupai tanduk kerbau dan sistem kekerabatan garis keturunan ibu (matrilineal) adalah ciri khas Rumah Gadang, rumah adat Minangkabau."
+      },
+      {
+        passage:"Bangunan ini tersusun dari jutaan batu andesit berwarna abu-abu gelap yang disusun berundak seperti gunung. Ratusan stupa kecil berjejer rapi di bagian atasnya, mengelilingi satu stupa induk yang menjulang paling tinggi. Relief pada dindingnya menceritakan kisah kehidupan Sang Buddha secara berurutan.",
+        options:["Candi Prambanan","Candi Borobudur","Menara Kudus","Candi Muara Takus"],
+        correct:1,
+        explanation:"Susunan berundak dari batu andesit, ratusan stupa, dan relief kisah Sang Buddha adalah ciri paling khas Candi Borobudur di Jawa Tengah."
+      },
+      {
+        passage:"Di bawah permukaannya yang jernih bagai kaca, terumbu karang berwarna-warni tumbuh seperti taman bunga raksasa. Ikan-ikan kecil berenang lincah keluar-masuk celah karang. Dilihat dari udara, gugusan pulau-pulaunya tampak seperti jamur-jamur hijau yang mengapung di atas laut biru toska.",
+        options:["Kepulauan Seribu","Nusa Penida","Raja Ampat","Danau Toba"],
+        correct:2,
+        explanation:"Terumbu karang warna-warni dan gugusan pulau menyerupai 'jamur mengapung' yang terlihat dari udara adalah gambaran khas Raja Ampat, Papua Barat."
+      }
+    ]
+  },
+  {
+    id:2,
+    place:"Candi Borobudur, Jawa Tengah",
+    icon:"🛕",
+    type:"mcq",
+    badgeName:"Ahli Ciri Teks",
+    badgeIcon:"📚",
+    story:"Kini kamu tiba di <b>Candi Borobudur</b>. Sebelum menulis deskripsi yang baik, seorang penjelajah sejati harus memahami dulu apa itu teks deskripsi: tujuannya, strukturnya, dan ciri kebahasaannya.",
+    challenge:"Tentukan Ciri Teks Deskripsi — pilih jawaban yang paling tepat untuk setiap pertanyaan.",
+    questions:[
+      {
+        qtext:"Apa tujuan utama sebuah teks deskripsi?",
+        options:[
+          "Menggambarkan objek serinci mungkin agar pembaca seolah-olah melihat, mendengar, atau merasakan sendiri",
+          "Menceritakan urutan peristiwa dari awal hingga akhir",
+          "Menyajikan pendapat pribadi disertai alasan yang kuat",
+          "Menjelaskan langkah-langkah melakukan sesuatu secara berurutan"
+        ],
+        correct:0,
+        explanation:"Teks deskripsi bertujuan menggambarkan ciri fisik atau suasana suatu objek secara rinci sehingga pembaca seolah dapat melihat, mendengar, atau merasakannya sendiri."
+      },
+      {
+        qtext:"Struktur teks deskripsi umumnya terdiri atas identifikasi, deskripsi bagian, dan …",
+        options:["Orientasi","Penutup atau kesan","Resolusi","Koda"],
+        correct:1,
+        explanation:"Struktur teks deskripsi terdiri atas (1) identifikasi/gambaran umum objek, (2) deskripsi bagian yang merinci ciri-ciri objek, dan (3) penutup berupa kesan atau simpulan penulis."
+      },
+      {
+        qtext:"Perhatikan kutipan berikut: \"Pantai ini terletak di ujung barat Pulau Lombok, tepatnya di Desa Kuta. Pasirnya berbentuk unik menyerupai butiran merica.\" Kutipan tersebut termasuk bagian …",
+        options:["Deskripsi bagian","Penutup","Identifikasi","Orientasi"],
+        correct:2,
+        explanation:"Kutipan tersebut memperkenalkan objek secara umum (nama dan lokasi), sehingga termasuk bagian identifikasi, bukan rincian ciri (deskripsi bagian) atau kesan akhir (penutup)."
+      },
+      {
+        qtext:"Ciri kebahasaan apa yang paling khas ditemukan dalam teks deskripsi?",
+        options:[
+          "Banyak kata kerja perintah (imperatif)",
+          "Banyak kata konkret dan kata sifat yang menggambarkan hasil pancaindra",
+          "Banyak konjungsi kronologis seperti 'lalu' dan 'kemudian'",
+          "Banyak kalimat tanya retoris"
+        ],
+        correct:1,
+        explanation:"Teks deskripsi kaya akan kata konkret (misalnya: biru, kasar, harum) dan kata sifat yang melukiskan apa yang dapat dilihat, didengar, dicium, dirasa, atau diraba."
+      },
+      {
+        qtext:"Pernyataan: \"Teks deskripsi yang baik boleh ditulis hanya berdasarkan khayalan, tanpa perlu mengamati ciri fisik objek sama sekali.\" Pernyataan ini …",
+        options:["Benar","Salah"],
+        correct:1,
+        explanation:"Salah. Teks deskripsi, terutama deskripsi objektif, sebaiknya ditulis berdasarkan pengamatan nyata terhadap ciri fisik objek agar gambaran yang dihasilkan akurat dan meyakinkan pembaca."
+      }
+    ]
+  },
+  {
+    id:3,
+    place:"Raja Ampat, Papua Barat",
+    icon:"🐠",
+    type:"word-click",
+    badgeName:"Pemburu Kata Konkret",
+    badgeIcon:"✋",
+    story:"Selamat datang di perairan <b>Raja Ampat</b>! Di sini kamu akan berlatih menemukan <b>kata konkret</b> — kata-kata yang menggambarkan sesuatu yang bisa ditangkap oleh pancaindra: warna, bentuk, tekstur, bunyi, rasa, atau aroma.",
+    challenge:"Bacalah paragraf berikut, lalu klik semua kata dari daftar di bawah yang termasuk kata konkret (bisa ditangkap pancaindra).",
+    passage:"Pasir putih Pantai Kuta terasa lembut ketika diinjak kaki telanjang. Ombaknya berdebur pelan menghantam karang, menimbulkan bunyi gemuruh yang menenangkan hati. Air lautnya berwarna biru toska dan jernih, sungguh menambah keindahan suasana sore itu.",
+    wordBank:["putih","lembut","berdebur","gemuruh","biru toska","jernih","keindahan","suasana","menenangkan","perasaan"],
+    correctWords:["putih","lembut","berdebur","gemuruh","biru toska","jernih"],
+    explanation:"Kata konkret yang tepat: 'putih', 'lembut', 'berdebur', 'gemuruh', 'biru toska', dan 'jernih' — semuanya bisa ditangkap indra penglihatan, peraba, atau pendengaran. Adapun 'keindahan', 'suasana', 'menenangkan', dan 'perasaan' termasuk kata abstrak karena menggambarkan kesan/emosi, bukan sesuatu yang dapat langsung diindra."
+  },
+  {
+    id:4,
+    place:"Tana Toraja, Sulawesi Selatan",
+    icon:"🏘️",
+    type:"order",
+    badgeName:"Penyusun Paragraf",
+    badgeIcon:"🧩",
+    story:"Kamu tiba di <b>Tana Toraja</b>, tempat berdirinya rumah adat Tongkonan yang unik. Namun, catatan deskripsi Kak Nusa tentang Tongkonan tercecer! Bantu susun kembali kalimat-kalimat berikut menjadi paragraf deskripsi yang runtut: identifikasi → deskripsi bagian → penutup.",
+    challenge:"Klik kalimat satu per satu sesuai urutan yang menurutmu paling tepat untuk membentuk paragraf deskripsi yang runtut.",
+    sentences:[
+      "Tongkonan adalah rumah adat khas suku Toraja yang terletak di Sulawesi Selatan.",
+      "Atapnya melengkung menyerupai perahu, terbuat dari susunan bambu yang disusun rapi tanpa paku.",
+      "Dinding rumah dihiasi ukiran berwarna merah, hitam, kuning, dan putih yang melambangkan kehidupan masyarakat Toraja.",
+      "Di depan rumah, berjejer tanduk kerbau yang menunjukkan status sosial pemiliknya.",
+      "Keunikan bentuk dan ukirannya menjadikan Tongkonan salah satu warisan budaya yang membanggakan Indonesia."
+    ],
+    correctOrder:[0,1,2,3,4],
+    explanation:"Urutan yang tepat: (1) kalimat identifikasi yang memperkenalkan Tongkonan secara umum, (2)-(4) deskripsi bagian yang merinci ciri fisik dari atap, dinding, hingga halaman depan, dan (5) kalimat penutup berupa kesan umum tentang keunikan Tongkonan."
+  },
+  {
+    id:5,
+    place:"Wae Rebo, Nusa Tenggara Timur",
+    icon:"⛰️",
+    type:"writing",
+    badgeName:"Penulis Cilik Nusantara",
+    badgeIcon:"✍️",
+    story:"Petualanganmu berakhir di <b>Wae Rebo</b>, desa adat di atas awan yang dikenal dengan rumah Mbaru Niang berbentuk kerucut. Sekarang giliranmu menjadi penulis! Tuliskan pengalamanmu menyusun teks deskripsi sendiri.",
+    challenge:"Tulislah sebuah teks deskripsi singkat (minimal 3 kalimat, ± 30 kata) tentang satu tempat wisata atau benda budaya Nusantara yang paling berkesan bagimu. Gunakan minimal 3 kata konkret yang menggambarkan warna, bentuk, suara, atau tekstur!",
+    concreteBank:["warna","berwarna","biru","merah","kuning","hijau","putih","hitam","cokelat","emas","lembut","kasar","halus","berbau","harum","wangi","manis","asin","pahit","berbunyi","bergemuruh","berdesir","mengalir","berkilau","besar","kecil","tinggi","rendah","luas","sempit","bulat","lonjong","runcing","melengkung","dingin","hangat","panas","sejuk","rapi","gelap","terang","jernih"],
+    modelAnswer:"Gunung Bromo terletak di Jawa Timur dan menjadi salah satu ikon wisata alam Indonesia. Puncaknya berbentuk kerucut dengan kawah yang terus mengeluarkan asap putih tipis. Pasir di sekitarnya berwarna abu-abu gelap dan terasa halus ketika diinjak, sementara udara pagi terasa sangat dingin dan menusuk kulit. Suasana matahari terbit yang berwarna jingga keemasan membuat siapa pun yang melihatnya merasa kagum.",
+    badgeIconWrite:"✍️"
+  }
+];
+
+/* =======================================================
+   STATE
+======================================================= */
+let state = {
+  screen:"start", // start | map | level | result
+  currentLevel:0,
+  totalScore:0,
+  progress: LEVELS.map(()=>({done:false, stars:0, score:0})),
+};
+
+let liveAnswers = {}; // temp answers for current level
+
+function totalStars(){
+  return state.progress.reduce((a,p)=>a+p.stars,0);
+}
+function updateHud(){
+  document.getElementById('hud-stars').textContent = totalStars();
+  document.getElementById('hud-score').textContent = state.totalScore;
+}
+
+/* =======================================================
+   RENDER ROUTER
+======================================================= */
+function render(){
+  updateHud();
+  const panel = document.getElementById('panel');
+  if(state.screen==="start") panel.innerHTML = renderStart();
+  else if(state.screen==="map") panel.innerHTML = renderMap();
+  else if(state.screen==="level") panel.innerHTML = renderLevel(state.currentLevel);
+  else if(state.screen==="result") panel.innerHTML = renderResult(state.currentLevel);
+  else if(state.screen==="final") panel.innerHTML = renderFinal();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ===== START ===== */
+function renderStart(){
+  return `
+  <div class="start-hero">
+    <svg class="compass" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#c8820a" stroke-width="2"/>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#f0ad1f" stroke-width="1" stroke-dasharray="2 3"/>
+      <polygon points="50,12 56,50 50,88 44,50" fill="#e2622b"/>
+      <polygon points="12,50 50,44 88,50 50,56" fill="#0f8b8d"/>
+      <circle cx="50" cy="50" r="5" fill="#22283a"/>
+    </svg>
+    <h2>Jelajah Nusantara</h2>
+    <p>Berlayarlah dari Sumatra hingga Nusa Tenggara sambil menguasai <b>Teks Deskripsi</b> — mulai dari menebak objek, mengenali ciri-ciri, menemukan kata konkret, menyusun paragraf, hingga menulis deskripsimu sendiri!</p>
+    <div class="guide-box">
+      <div class="emoji">🧑‍✈️</div>
+      <div>
+        <b>Kak Nusa:</b> "Halo, Penjelajah! Ada 5 pulau menantimu, masing-masing dengan tantangan Bahasa Indonesia yang seru. Kumpulkan bintang dan lencana sebanyak-banyaknya, ya. Siap berlayar?"
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goMap()">🚢 Mulai Petualangan</button>
+      <button class="btn btn-ghost" onclick="openKeyModal()">📖 Lihat Kunci Jawaban</button>
+    </div>
+  </div>`;
+}
+
+function goMap(){ state.screen="map"; render(); }
+
+/* ===== MAP ===== */
+function renderMap(){
+  let islands = LEVELS.map((lv,i)=>{
+    const prog = state.progress[i];
+    const unlocked = i===0 || state.progress[i-1].done;
+    const cls = ["island"];
+    if(!unlocked) cls.push("locked");
+    if(prog.done) cls.push("done");
+    if(unlocked && !prog.done) cls.push("current");
+    const stars = prog.done ? "⭐".repeat(prog.stars) + "☆".repeat(3-prog.stars) : "";
+    return `
+    <div class="${cls.join(' ')}" onclick="${unlocked? `startLevel(${i})`:''}">
+      <div class="island-icon">${lv.icon}</div>
+      <div class="island-name">Pulau ${i+1}<br>${lv.place.split(',')[0]}</div>
+      <div class="island-stars">${stars}</div>
+      ${!unlocked?'<div class="lock-tag">🔒 Terkunci</div>':''}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="map-title">
+      <h2>🗺️ Peta Jelajah</h2>
+      <p>Klik sebuah pulau untuk memulai tantangan. Selesaikan berurutan untuk membuka pulau berikutnya!</p>
+    </div>
+    <div class="island-row">${islands}</div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-ghost" onclick="goStart()">⬅️ Kembali</button>
+      ${totalStars()>0 ? `<button class="btn btn-gold" onclick="goFinal()">🏆 Lihat Hasil Akhir</button>` : ''}
+    </div>
+  `;
+}
+function goStart(){ state.screen="start"; render(); }
+function startLevel(i){
+  state.currentLevel = i;
+  liveAnswers = {};
+  state.screen="level";
+  render();
+}
+
+/* ===== LEVEL RENDER ===== */
+function renderLevel(i){
+  const lv = LEVELS[i];
+  let body = "";
+  if(lv.type==="mcq") body = renderMCQ(lv);
+  else if(lv.type==="word-click") body = renderWordClick(lv);
+  else if(lv.type==="order") body = renderOrder(lv);
+  else if(lv.type==="writing") body = renderWriting(lv);
+
+  return `
+    <div class="level-tag">Pulau ${i+1} dari 5</div>
+    <div class="level-header">
+      <h2>${lv.icon} ${lv.place}</h2>
+    </div>
+    <div class="story">${lv.story}</div>
+    <div class="challenge-box">
+      <h3>🎯 Tantangan</h3>
+      <p>${lv.challenge}</p>
+    </div>
+    ${body}
+    <div class="level-footer">
+      <button class="btn btn-ghost btn-small" onclick="goMap()">⬅️ Peta</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitLevel(${i})">✅ Periksa Jawaban</button>
+    </div>
+  `;
+}
+
+/* ----- MCQ ----- */
+function renderMCQ(lv){
+  return lv.questions.map((q,qi)=>{
+    const letters=["A","B","C","D"];
+    const opts = q.options.map((o,oi)=>`
+      <button class="opt" id="opt-${qi}-${oi}" onclick="pickMCQ(${qi},${oi})">
+        <span class="opt-letter">${letters[oi]}</span> ${o}
+      </button>`).join('');
+    return `
+    <div class="qcard">
+      <div class="qnum">Soal ${qi+1}</div>
+      ${q.passage ? `<div class="passage">${q.passage}</div>` : ''}
+      ${q.qtext ? `<div class="qtext">${q.qtext}</div>` : ''}
+      <div class="options" id="opts-${qi}">${opts}</div>
+      <div class="feedback" id="fb-${qi}"></div>
+    </div>`;
+  }).join('');
+}
+function pickMCQ(qi,oi){
+  liveAnswers[qi]=oi;
+  document.querySelectorAll(`#opts-${qi} .opt`).forEach((el,idx)=>{
+    el.classList.toggle('selected', idx===oi);
+  });
+}
+
+/* ----- WORD CLICK ----- */
+function renderWordClick(lv){
+  liveAnswers.picked = liveAnswers.picked || [];
+  const chips = lv.wordBank.map(w=>`
+    <div class="word-chip" data-w="${w}" onclick="toggleWord(this,'${w}')">${w}</div>
+  `).join('');
+  return `
+    <div class="qcard">
+      <div class="qnum">Bacaan</div>
+      <div class="passage">${lv.passage}</div>
+      <div class="qtext">Klik semua kata konkret yang kamu temukan pada daftar berikut:</div>
+      <div class="word-bank">${chips}</div>
+      <div class="feedback" id="fb-word"></div>
+    </div>
+  `;
+}
+function toggleWord(el,w){
+  const idx = liveAnswers.picked.indexOf(w);
+  if(idx>-1){ liveAnswers.picked.splice(idx,1); el.classList.remove('picked'); }
+  else { liveAnswers.picked.push(w); el.classList.add('picked'); }
+}
+
+/* ----- ORDER ----- */
+function renderOrder(lv){
+  liveAnswers.sequence = liveAnswers.sequence || [];
+  const pool = lv.sentences.map((s,idx)=>{
+    const chosen = liveAnswers.sequence.includes(idx);
+    return `<div class="sentence-item ${chosen?'chosen':''}" id="sent-${idx}" onclick="${chosen?'':'pickSentence('+idx+')'}">
+      <div class="order-badge">${chosen ? (liveAnswers.sequence.indexOf(idx)+1) : '＋'}</div>
+      <div>${s}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="qcard">
+      <div class="qnum">Kalimat Acak — klik berurutan sesuai susunan yang menurutmu tepat</div>
+      <div class="sentence-pool" id="sentPool">${pool}</div>
+      <button class="btn btn-ghost btn-small" onclick="resetOrder()">↺ Ulangi Susunan</button>
+      <div class="feedback" id="fb-order"></div>
+    </div>
+  `;
+}
+function pickSentence(idx){
+  if(!liveAnswers.sequence.includes(idx)){
+    liveAnswers.sequence.push(idx);
+  }
+  refreshLevelPartial();
+}
+function resetOrder(){ liveAnswers.sequence=[]; refreshLevelPartial(); }
+function refreshLevelPartial(){
+  // simplest robust approach: re-render whole level, keep liveAnswers
+  document.getElementById('panel').innerHTML = renderLevel(state.currentLevel);
+}
+
+/* ----- WRITING ----- */
+function renderWriting(lv){
+  liveAnswers.text = liveAnswers.text || "";
+  return `
+    <div class="qcard">
+      <div class="qnum">Tulisanmu</div>
+      <textarea id="writeArea" placeholder="Tulis teks deskripsimu di sini...">${liveAnswers.text}</textarea>
+      <div class="feedback" id="fb-write"></div>
+    </div>
+  `;
+}
+
+/* =======================================================
+   SUBMIT / SCORING
+======================================================= */
+function submitLevel(i){
+  const lv = LEVELS[i];
+  let correctCount=0, total=0, starRatio=0;
+
+  if(lv.type==="mcq"){
+    total = lv.questions.length;
+    lv.questions.forEach((q,qi)=>{
+      const chosen = liveAnswers[qi];
+      const opts = document.querySelectorAll(`#opts-${qi} .opt`);
+      opts.forEach((el,oi)=>{
+        el.classList.remove('selected');
+        if(oi===q.correct) el.classList.add('correct');
+        else if(oi===chosen) el.classList.add('wrong');
+        el.onclick=null;
+      });
+      const fb = document.getElementById(`fb-${qi}`);
+      const ok = chosen===q.correct;
+      if(ok) correctCount++;
+      fb.className = "feedback show " + (ok?"ok":"no");
+      fb.innerHTML = (ok? "✅ Benar! " : "❌ Belum tepat. ") + q.explanation;
+    });
+    starRatio = correctCount/total;
+  }
+
+  else if(lv.type==="word-click"){
+    total = lv.correctWords.length;
+    const picked = liveAnswers.picked || [];
+    document.querySelectorAll('.word-chip').forEach(el=>{
+      const w = el.dataset.w;
+      const isCorrect = lv.correctWords.includes(w);
+      const wasPicked = picked.includes(w);
+      el.onclick=null;
+      if(isCorrect && wasPicked) el.classList.add('correct');
+      else if(isCorrect && !wasPicked) el.classList.add('missed');
+      else if(!isCorrect && wasPicked) el.classList.add('wrongpick');
+    });
+    correctCount = picked.filter(w=>lv.correctWords.includes(w)).length;
+    const wrongPicks = picked.filter(w=>!lv.correctWords.includes(w)).length;
+    const net = Math.max(0, correctCount - wrongPicks);
+    starRatio = net/total;
+    const fb = document.getElementById('fb-word');
+    const ok = net===total;
+    fb.className = "feedback show " + (net>0?"ok":"no");
+    fb.innerHTML = (ok? "✅ Sempurna! " : `🔎 Kamu menemukan ${correctCount} dari ${total} kata konkret. `) + lv.explanation;
+    correctCount = net; total = total;
+  }
+
+  else if(lv.type==="order"){
+    total = lv.correctOrder.length;
+    const seq = liveAnswers.sequence || [];
+    let matches=0;
+    for(let k=0;k<lv.correctOrder.length;k++){
+      if(seq[k]===lv.correctOrder[k]) matches++;
+    }
+    correctCount = matches;
+    starRatio = matches/total;
+    const ok = matches===total;
+    // recolor pool
+    document.querySelectorAll('.sentence-item').forEach((el,idx)=>{
+      el.onclick=null;
+      const posInSeq = seq.indexOf(idx);
+      if(posInSeq>-1 && lv.correctOrder[posInSeq]===idx) el.style.border="2px solid var(--success)";
+      else if(posInSeq>-1) el.style.border="2px solid var(--error)";
+    });
+    const fb = document.getElementById('fb-order');
+    fb.className = "feedback show " + (ok?"ok":"no");
+    fb.innerHTML = (ok? "✅ Urutanmu tepat! " : `🧩 ${matches} dari ${total} posisi sudah tepat. `) + lv.explanation;
+  }
+
+  else if(lv.type==="writing"){
+    const txt = document.getElementById('writeArea').value.trim();
+    liveAnswers.text = txt;
+    const words = txt.split(/\s+/).filter(Boolean);
+    const wordCount = words.length;
+    const sentenceCount = (txt.match(/[.!?]+/g)||[]).length;
+    const lowerTxt = txt.toLowerCase();
+    const concreteHits = lv.concreteBank.filter(k=>lowerTxt.includes(k)).length;
+
+    const crit = [
+      {label:`Panjang minimal 30 kata (tulisanmu: ${wordCount} kata)`, pass: wordCount>=30},
+      {label:`Terdiri atas minimal 3 kalimat (terdeteksi: ${sentenceCount} kalimat)`, pass: sentenceCount>=3},
+      {label:`Mengandung minimal 3 kata konkret pancaindra (terdeteksi: ${concreteHits} kata)`, pass: concreteHits>=3},
+      {label:"Tulisan tidak kosong dan sudah kamu susun sendiri", pass: wordCount>0}
+    ];
+    const passed = crit.filter(c=>c.pass).length;
+    total = crit.length; correctCount = passed; starRatio = passed/total;
+
+    const fb = document.getElementById('fb-write');
+    fb.className = "feedback show " + (passed>=3?"ok":"no");
+    fb.innerHTML = `
+      <div style="margin-bottom:8px;">${passed>=3? "✅ Deskripsimu sudah cukup lengkap, kerja bagus!":"📝 Masih ada bagian yang bisa kamu lengkapi."}</div>
+      <div class="checklist">
+        ${crit.map(c=>`<div class="check-item ${c.pass?'pass':'fail'}"><span class="mark">${c.pass?'✅':'❌'}</span>${c.label}</div>`).join('')}
+      </div>
+      <div class="model-answer"><b>Contoh teks deskripsi (kunci referensi):</b><br>${lv.modelAnswer}</div>
+    `;
+  }
+
+  // stars
+  let stars = starRatio>=0.999 ? 3 : starRatio>=0.7 ? 2 : starRatio>0 ? 1 : 0;
+  const points = correctCount*10;
+
+  state.progress[i] = { done:true, stars, score:points };
+  state.totalScore = state.progress.reduce((a,p)=>a+p.score,0);
+
+  document.getElementById('submitBtn').outerHTML = `<button class="btn btn-gold" onclick="showResult(${i})">🎉 Lihat Hasil</button>`;
+  updateHud();
+}
+
+/* =======================================================
+   RESULT SCREEN
+======================================================= */
+function showResult(i){ state.currentLevel=i; state.screen="result"; render(); }
+
+function renderResult(i){
+  const lv = LEVELS[i];
+  const prog = state.progress[i];
+  const starDisplay = "⭐".repeat(prog.stars)+"☆".repeat(3-prog.stars);
+  const earnedBadge = prog.stars>=2;
+  const nextUnlocked = i<LEVELS.length-1;
+  return `
+    <div class="result-box">
+      <div style="font-size:46px;">${lv.icon}</div>
+      <h2>Pulau ${lv.place.split(',')[0]} Selesai!</h2>
+      <div class="result-stars">${starDisplay}</div>
+      <p style="color:var(--ink-soft);">Kamu meraih <b>${prog.score} poin</b> di level ini.</p>
+      ${earnedBadge ? `<div class="badge-earned">${lv.badgeIcon} Lencana "${lv.badgeName}" diraih!</div>` : `<p style="font-size:13px;color:var(--ink-soft);">Kumpulkan minimal 2 bintang untuk meraih lencana pulau ini. Kamu bisa mencoba lagi nanti!</p>`}
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goMap()">🗺️ Kembali ke Peta</button>
+        ${nextUnlocked ? `<button class="btn btn-primary" onclick="startLevel(${i+1})">➡️ Pulau Berikutnya</button>` : `<button class="btn btn-gold" onclick="goFinal()">🏆 Lihat Hasil Akhir</button>`}
+      </div>
+    </div>
+  `;
+}
+
+/* =======================================================
+   FINAL SCREEN
+======================================================= */
+function goFinal(){ state.screen="final"; render(); }
+function renderFinal(){
+  const stars = totalStars();
+  let tier;
+  if(stars>=13) tier = {icon:"🏆", name:"Duta Cilik Nusantara", desc:"Kamu menguasai teks deskripsi luar dalam. Luar biasa!"};
+  else if(stars>=8) tier = {icon:"🥈", name:"Penjelajah Andal", desc:"Pemahamanmu tentang teks deskripsi sudah sangat baik!"};
+  else tier = {icon:"🥉", name:"Penjelajah Pemula", desc:"Awal yang baik! Coba lagi untuk mengumpulkan lebih banyak bintang."};
+
+  const badges = LEVELS.map((lv,i)=>{
+    const earned = state.progress[i].stars>=2;
+    return `<div class="mini-badge ${earned?'':'locked'}">
+      <div class="ic">${earned? lv.badgeIcon : '🔒'}</div>
+      ${lv.badgeName}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="result-box">
+      <div class="final-badge">${tier.icon}</div>
+      <h2>${tier.name}</h2>
+      <p style="color:var(--ink-soft); max-width:420px; margin:0 auto;">${tier.desc}</p>
+      <div class="result-stars">⭐ ${stars} / 15</div>
+      <p style="color:var(--ink-soft);">Total poin: <b>${state.totalScore}</b></p>
+      <div class="badge-grid">${badges}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goMap()">🗺️ Kembali ke Peta</button>
+        <button class="btn btn-primary" onclick="openKeyModal()">📖 Kunci Jawaban</button>
+      </div>
+    </div>
+  `;
+}
+
+/* =======================================================
+   ANSWER KEY MODAL
+======================================================= */
+function openKeyModal(){
+  const content = LEVELS.map((lv,i)=>{
+    let items="";
+    if(lv.type==="mcq"){
+      items = lv.questions.map((q,qi)=>{
+        const letters=["A","B","C","D"];
+        return `<div class="key-item"><b>Soal ${qi+1}:</b> Jawaban ${letters[q.correct]} — ${q.options[q.correct]}<br><i>${q.explanation}</i></div>`;
+      }).join('');
+    } else if(lv.type==="word-click"){
+      items = `<div class="key-item"><b>Kata konkret yang benar:</b> ${lv.correctWords.join(', ')}<br><i>${lv.explanation}</i></div>`;
+    } else if(lv.type==="order"){
+      const order = lv.correctOrder.map((idx,pos)=>`${pos+1}) ${lv.sentences[idx]}`).join('<br>');
+      items = `<div class="key-item"><b>Urutan yang benar:</b><br>${order}<br><i>${lv.explanation}</i></div>`;
+    } else if(lv.type==="writing"){
+      items = `<div class="key-item"><b>Contoh teks deskripsi (rubrik referensi):</b><br>${lv.modelAnswer}<br><br><b>Kriteria penilaian:</b> minimal 30 kata, minimal 3 kalimat, minimal 3 kata konkret pancaindra (warna/bentuk/bunyi/tekstur/rasa/aroma), serta memiliki struktur identifikasi–deskripsi bagian–penutup.</div>`;
+    }
+    return `<div class="key-section"><h3>${lv.icon} Pulau ${i+1}: ${lv.place}</h3>${items}</div>`;
+  }).join('');
+  document.getElementById('keyContent').innerHTML = content;
+  document.getElementById('keyModal').classList.add('show');
+}
+function closeKeyModal(){ document.getElementById('keyModal').classList.remove('show'); }
+
+/* init */
+render();
+</script>
+</body>
+</html>
